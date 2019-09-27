@@ -16,12 +16,16 @@ void loop()
 // enviar los datos de la consola serial al ESP-01, 
 // y mostrar lo enviado por el ESP-01 a nuestra consola
 {
-  if (softSerial.available())
+  //Lee los datos del ESP8266
+  while (softSerial.available())
   {
     Serial.print((char)softSerial.read());
   }
-  if (Serial.available())
+  softSerial.println("HOLIS");
+  
+  /*if (Serial.available())
   {
-    softSerial.print((char)Serial.read());
-  }
+    Serial.println("Cond 2");
+    softSerial.println((char)Serial.read());
+  }*/
 }

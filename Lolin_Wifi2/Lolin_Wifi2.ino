@@ -1,11 +1,14 @@
 #include <ESP8266WiFi.h>
-#include <SoftwareSerial.h>
+#include <ArduinoJson.h>
 #include <ESP8266HTTPClient.h> //HTTP Requests
+//#include <SoftwareSerial.h>
 
+//SoftwareSerial softSerial(3, 2); // RX, TX
+//const char* ssid = "TURBONETT_24CA8E";
+//const char* password = "c566b7c995";
 
-SoftwareSerial softSerial(, tx); // RX, TX
-const char* ssid = "TURBONETT_24CA8E";
-const char* password = "c566b7c995";
+const char* ssid = "Fam._Monroy";
+const char* password = "2dc808998a";
 
 //const char* ssid = "MI";
 //const char* password = "nachodudes";
@@ -13,19 +16,25 @@ const char* password = "c566b7c995";
 //const char* host = "18.206.88.138";
 const String host= "18.206.88.138";
 const uint16_t port=8000;
-const String endpoint="/configuracion/led/";
+const String endpoint="/configuracion/arduino/color_led/";
 
 
 void setup()
 {
   Serial.begin(9600);
   Serial.println();
+  pinMode(LED_BUILTIN, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
+  digitalWrite(LED_BUILTIN,HIGH); //LED OFF
   //Serial.setDebugOutput(true);
 
+  /*if(Serial.available()){
+    Serial.println(Serial.read());
+  }*/
   //Habilita conexión a WEP
   WiFi.enableInsecureWEP(); 
 
   Serial.printf("Connecting to %s ", ssid);
+  Serial.println();
   WiFi.begin(ssid, password);
   int status;
   while (WiFi.status() != WL_CONNECTED)
@@ -62,60 +71,42 @@ void setup()
     delay(1000);
     //Serial.print(".");
   }
+  Serial.print(WiFi.localIP());
   Serial.println(" connected");
+  digitalWrite(LED_BUILTIN,LOW);  // Turn the LED on (Note that LOW is the voltage level
+  // but actually the LED is on; this is because
+  // it is active low on the ESP-01);
+  
 }
 
 
 void loop()
 {
+    String temp="";
     HTTPClient http;    //Declare object of class HTTPClient
     
-   http.begin(host,port,endpoint);      //Specify request destination
-   http.addHeader("Content-Type", "text/plain");  //Specify content-type header
- 
-   int httpCode = http.GET();   //Send the request
-   String payload = http.getString();                  //Get the response payload
-   Serial.println("Resultado de conectar a " +host+endpoint);
-   Serial.print("Código de respuesta: ");
-   Serial.println(httpCode);   //Print HTTP return code
-   
-   Serial.print("Respuesta: '");
-   Serial.print(payload);    //Print request response payload
-   Serial.println("'");
-   Serial.println();
+    http.begin(host,port,endpoint);      //Specify request destination
+    http.addHeader("Content-Type", "text/plain");  //Specify content-type header
+    
+    int httpCode = http.GET();   //Send the request
+    String payload = http.getString();                  //Get the response payload
+    Serial.println("Resultado de conectar a " +host+endpoint);
+    Serial.print("Código de respuesta: ");
+    Serial.println(httpCode);   //Print HTTP return code
+    
+    Serial.print("Respuesta: '");
+    Serial.print(payload);    //Print request response payload
+    Serial.println("'");
+    Serial.println();
+    delay(500);
+    while(Serial.available()){
+      temp=temp+(char)Serial.read();
+    }
+    Serial.println();
+    Serial.println(temp);
+  
    
    http.end();  //Close connection
-  //////////////////////
-  /*WiFiClient client;
-  
-  Serial.printf("\n[Connecting to %s ... ", host);
-  if (client.connect(host, port))
-  {
-    Serial.println("connected]");
-
-    Serial.println("[Sending a request]");
-    client.print(String("GET "+endpoint) + " HTTP/1.1\r\n" +
-                 "Host: " + host + "\r\n" +
-                 "Connection: close\r\n" +
-                 "\r\n"
-                );
-
-    Serial.println("[Response:]");
-    while (client.connected() || client.available())
-    {
-      if (client.available())
-      {
-        String line = client.readStringUntil('\n');
-        Serial.println(line);
-      }
-    }
-    client.stop();
-    Serial.println("\n[Disconnected]");
-  }
-  else
-  {
-    Serial.println("connection failed!]");
-    client.stop();
-  }*/
+   
   delay(5000);
 }

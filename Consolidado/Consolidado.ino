@@ -2,7 +2,7 @@
 #include <Adafruit_Fingerprint.h>
 
 
-SoftwareSerial mySerial(2, 3);
+SoftwareSerial mySerial(2, 3);  // RX, TX
 Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
 
 uint8_t id;
